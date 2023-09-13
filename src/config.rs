@@ -9,6 +9,7 @@ lazy_static! {
         let config_dir = homedir.join(".alexa-util").join("config.json");
         config_dir
     };
+    pub static ref CONFIG: Config = Config::new().expect("Unable to load config");
 }
 
 #[derive(Debug, Clone, Eq, PartialOrd, Ord, PartialEq, Hash, Serialize, Deserialize)]
@@ -73,7 +74,10 @@ impl Config {
 
 impl Drop for Config {
     fn drop(&mut self) {
-        self.write().unwrap();
+        match self.write() {
+            Ok(_) => (),
+            Err(err) => eprintln!("Failed to write config: {:?}", err),
+        }
     }
 }
 
